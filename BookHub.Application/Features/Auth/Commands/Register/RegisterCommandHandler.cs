@@ -8,10 +8,14 @@ public class RegisterCommandHandler
     : IRequestHandler<RegisterCommand, int>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IPasswordHasherService _passwordHasher;
 
-    public RegisterCommandHandler(IUnitOfWork unitOfWork)
+    public RegisterCommandHandler(
+        IUnitOfWork unitOfWork,
+        IPasswordHasherService passwordHasher)
     {
         _unitOfWork = unitOfWork;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<int> Handle(
@@ -22,7 +26,7 @@ public class RegisterCommandHandler
         {
             FullName = request.FullName,
             Email = request.Email,
-            PasswordHash = request.Password, // Day 5 me hash karenge
+            PasswordHash = _passwordHasher.HashPassword(request.Password),
             RoleId = 2,
             CreatedOn = DateTime.UtcNow,
             CreatedBy = "System"
